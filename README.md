@@ -2,6 +2,8 @@
 
 > *A fog descends upon your editor.*
 
+![Miasma theme screenshot](miasma.png)
+
 A dark Emacs colour scheme built from muted earth tones — moss, bark,
 rust, amber, and fog. Based on xero's
 [miasma terminal theme](https://terminalcolors.com/themes/miasma/default/)
