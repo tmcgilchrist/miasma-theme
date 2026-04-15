@@ -46,8 +46,12 @@ All notable changes to miasma-theme are documented here. Versions follow
   byte-compiles cleanly with `byte-compile-error-on-warn` enabled.
 
 ### Infrastructure
-- GitHub Actions CI (`.github/workflows/ci.yml`) byte-compiles and
-  loads the theme across Emacs 27.1, 28.2, 29.4, 30.1, and snapshot.
+- Continuous integration on two forges:
+  - **GitHub Actions** (`.github/workflows/ci.yml`) byte-compiles and
+    loads the theme across Emacs 27.1, 28.2, 29.4, 30.1, and snapshot.
+  - **Tangled** (`.tangled/workflows/ci.yaml`) runs the same
+    byte-compile + load check via the `nixery` engine using
+    `emacs-nox` from nixpkgs.
 
 ### Fixed
 - Magit selection highlights (`magit-section-heading-selection`,

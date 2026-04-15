@@ -1,7 +1,5 @@
 # Miasma Theme for Emacs
 
-[![CI](https://github.com/tmcgilchrist/miasma-theme/actions/workflows/ci.yml/badge.svg)](https://github.com/tmcgilchrist/miasma-theme/actions/workflows/ci.yml)
-
 > *A fog descends upon your editor.*
 
 A dark Emacs colour scheme built from muted earth tones — moss, bark,

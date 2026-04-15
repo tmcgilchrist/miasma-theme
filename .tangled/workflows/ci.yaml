@@ -1,0 +1,23 @@
+when:
+  - event: ["push"]
+    branch: ["main"]
+  - event: ["pull_request"]
+
+engine: "nixery"
+
+dependencies:
+  nixpkgs:
+    - emacs-nox
+
+steps:
+  - name: "Byte-compile theme"
+    command: |
+      emacs --batch -Q -L . \
+        --eval "(setq byte-compile-error-on-warn t)" \
+        -f batch-byte-compile miasma-theme.el
+
+  - name: "Load theme"
+    command: |
+      emacs --batch -Q \
+        --eval "(add-to-list 'custom-theme-load-path default-directory)" \
+        --eval "(load-theme 'miasma t)"
