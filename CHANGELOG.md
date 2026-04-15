@@ -3,24 +3,6 @@
 All notable changes to miasma-theme are documented here. Versions follow
 [Semantic Versioning](https://semver.org/).
 
-## Unreleased
-
-### Added
-- `DESIGN.md` documenting semantic colour roles and the intentionally
-  earth-toned palette (accent names like `blue` / `cyan` / `magenta` map
-  to warm hues by design).
-- `miasma-scale-headings` defcustom to scale outline / org / markdown
-  headings above body text. Defaults to `t`.
-- Explicit miasma-tuned faces for:
-  - magit (branches, tags, hash, section headings)
-  - flymake (wave underlines with miasma accents)
-  - corfu (in-buffer completion popup)
-  - vertico (minibuffer completion)
-  - marginalia (annotations)
-  - eglot (symbol highlight, mode-line, diagnostic tags)
-  - tree-sitter-hl (function/method/type/parameter/property)
-- `CHANGELOG.md` (this file).
-
 ## 0.1.0
 
 ### Added
@@ -30,3 +12,39 @@ All notable changes to miasma-theme are documented here. Versions follow
   `miasma-comment-bg`, `miasma-padded-modeline`.
 - Face tuning for doom-modeline, ivy, markdown, org, solaire-mode,
   LaTeX, elscreen, css/scss.
+- `DESIGN.md` documenting semantic colour roles and the intentionally
+  earth-toned palette (accent names like `blue` / `cyan` / `magenta` map
+  to warm hues by design).
+- `miasma-scale-headings` defcustom to scale outline / org / markdown
+  headings above body text. Defaults to `t`.
+- `miasma-override-colors-alist` defcustom — tweak individual palette
+  entries without forking.
+- Public `miasma-colors-alist` palette constant plus `miasma-darken` /
+  `miasma-lighten` helpers.
+- Explicit miasma-tuned faces for: org (levels, todo/done, blocks,
+  tables, agenda), markdown, magit (sections, branches, diff, hunks),
+  flymake / flycheck, corfu, vertico, marginalia, eglot, tree-sitter-hl,
+  ediff, dired, compilation, isearch, ansi-color, doom-modeline,
+  solaire-mode, LaTeX, CSS/SCSS.
+- `CHANGELOG.md` (this file).
+
+### Changed
+- **Breaking:** dropped the `doom-themes` dependency. Miasma is now
+  a plain `deftheme` and works in vanilla Emacs 27.1+. Users who relied
+  on doom-themes' blanket face coverage for unthemed packages should
+  file an issue for any regressions.
+- Palette moved out of the `def-doom-theme` macro into a top-level
+  `defconst`, so face definitions can be shared between variants in
+  the future.
+- `miasma-padded-modeline` default is now `nil` (previously inherited
+  from `doom-themes-padded-modeline`).
+
+### Removed
+- Dependency on `doom-themes`. `Package-Requires` now lists only
+  `(emacs "27.1")`.
+- `no-byte-compile: t` file-local variable — the theme now
+  byte-compiles cleanly with `byte-compile-error-on-warn` enabled.
+
+### Infrastructure
+- GitHub Actions CI (`.github/workflows/ci.yml`) byte-compiles and
+  loads the theme across Emacs 27.1, 28.2, 29.4, 30.1, and snapshot.
