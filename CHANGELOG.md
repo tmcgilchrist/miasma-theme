@@ -48,3 +48,15 @@ All notable changes to miasma-theme are documented here. Versions follow
 ### Infrastructure
 - GitHub Actions CI (`.github/workflows/ci.yml`) byte-compiles and
   loads the theme across Emacs 27.1, 28.2, 29.4, 30.1, and snapshot.
+
+### Fixed
+- Magit selection highlights (`magit-section-heading-selection`,
+  `magit-diff-file-heading-selection`, `magit-diff-hunk-heading-selection`)
+  no longer fall back to magit's salmon defaults. They now use a neutral
+  grey that matches the rest of Emacs's region highlighting. New palette
+  slots `selection` and `region-bg` (both default `#333333`) let users
+  retint via `miasma-override-colors-alist`.
+
+### Docs
+- `README.md` documenting installation, customisation, supported
+  packages, and the complementary terminal theme.

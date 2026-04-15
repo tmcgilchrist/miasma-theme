@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  byte-compile:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        emacs-version: ['27.1', '28.2', '29.4', '30.1', 'snapshot']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.emacs-version }}
+      - name: Byte-compile theme
+        run: |
+          emacs --batch -Q -L . \
+            --eval "(setq byte-compile-error-on-warn t)" \
+            -f batch-byte-compile miasma-theme.el
+      - name: Load theme
+        run: |
+          emacs --batch -Q \
+            --eval "(add-to-list 'custom-theme-load-path default-directory)" \
+            --eval "(load-theme 'miasma t)"

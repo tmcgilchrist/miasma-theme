@@ -123,7 +123,11 @@ changes take effect next time the theme is loaded."
     (magenta    . "#bb7744")
     (violet     . "#bb7744")
     (cyan       . "#c9a554")
-    (dark-cyan  . "#b39448"))
+    (dark-cyan  . "#b39448")
+    ;; Neutral greys used for selection / region backgrounds.
+    ;; Override via `miasma-override-colors-alist' to retint selection.
+    (selection  . "#333333")
+    (region-bg  . "#333333"))
   "Miasma colour palette — hex strings keyed by role.
 See DESIGN.md for the semantic meaning of each slot.")
 
@@ -156,10 +160,11 @@ See DESIGN.md for the semantic meaning of each slot.")
        (magenta    (alist-get 'magenta colors))
        (cyan       (alist-get 'cyan colors))
        (dark-cyan  (alist-get 'dark-cyan colors))
+       (selection  (alist-get 'selection colors))
+       (region-bg  (alist-get 'region-bg colors))
 
        ;; semantic roles
        (highlight  yellow)
-       (region     base3)
        (vertical-bar (miasma-darken base1 0.1))
        (comments   (if miasma-brighter-comments dark-cyan base6))
        (doc-comments (miasma-lighten (if miasma-brighter-comments dark-cyan base6) 0.25))
@@ -195,7 +200,7 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(window-divider      ((t (:foreground ,vertical-bar))))
    `(window-divider-first-pixel ((t (:foreground ,vertical-bar))))
    `(window-divider-last-pixel  ((t (:foreground ,vertical-bar))))
-   `(region              ((t (:background ,region :extend t))))
+   `(region              ((t (:background ,region-bg :extend t))))
    `(secondary-selection ((t (:background ,base3 :extend t))))
    `(highlight           ((t (:background ,base3 :foreground ,fg))))
    `(hl-line             ((t (:background ,base2 :extend t))))
@@ -382,6 +387,12 @@ See DESIGN.md for the semantic meaning of each slot.")
 ;;;; magit
    `(magit-section-heading          ((t (:foreground ,yellow :weight bold))))
    `(magit-section-highlight        ((t (:background ,base2 :extend t))))
+   ;; Selection highlights (region, marked entries in untracked/staged/…)
+   ;; intentionally use the neutral `selection' slot so they match the rest
+   ;; of Emacs.  Retint via (miasma-override-colors-alist '((selection . …))).
+   `(magit-section-heading-selection    ((t (:foreground ,yellow :background ,selection :extend t))))
+   `(magit-diff-file-heading-selection  ((t (:foreground ,fg :background ,selection :weight bold :extend t))))
+   `(magit-diff-hunk-heading-selection  ((t (:foreground ,blue :background ,selection :extend t))))
    `(magit-diff-file-heading        ((t (:foreground ,fg :weight bold))))
    `(magit-diff-file-heading-highlight ((t (:background ,base2 :weight bold :extend t))))
    `(magit-diff-hunk-heading        ((t (:foreground ,blue :background ,bg-alt :extend t))))
