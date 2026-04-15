@@ -7,7 +7,7 @@ engine: "nixery"
 
 dependencies:
   nixpkgs:
-    - emacs-nox
+    - emacs30
 
 steps:
   - name: "Byte-compile theme"

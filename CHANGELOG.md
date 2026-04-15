@@ -51,7 +51,7 @@ All notable changes to miasma-theme are documented here. Versions follow
     loads the theme across Emacs 27.1, 28.2, 29.4, 30.1, and snapshot.
   - **Tangled** (`.tangled/workflows/ci.yaml`) runs the same
     byte-compile + load check via the `nixery` engine using
-    `emacs-nox` from nixpkgs.
+    `emacs30` from nixpkgs.
 
 ### Fixed
 - Magit selection highlights (`magit-section-heading-selection`,
