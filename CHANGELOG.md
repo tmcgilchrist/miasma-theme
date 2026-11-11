@@ -3,6 +3,20 @@
 All notable changes to miasma-theme are documented here. Versions follow
 [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+- `ansi-color-*` faces now match the miasma Terminal.app profile exactly:
+  yellow / bright-yellow use rust (`orange`), white / bright-white use the
+  new cream `white` slot, bright-black uses `base6`, bright-red uses
+  `red`, and black uses the new `black` slot.
+- Cursor is now rust (`orange`), matching the terminal profile.
+- Region and magit selection highlights now use the terminal's pale gold
+  selection colour (`#e5c47b`) with dark text, replacing the neutral grey.
+
+### Added
+- Palette slots `black`, `white`, `selection-fg` and `region-fg`.
+
 ## 0.1.0
 
 ### Added

@@ -124,10 +124,16 @@ changes take effect next time the theme is loaded."
     (violet     . "#bb7744")
     (cyan       . "#c9a554")
     (dark-cyan  . "#b39448")
-    ;; Neutral greys used for selection / region backgrounds.
-    ;; Override via `miasma-override-colors-alist' to retint selection.
-    (selection  . "#333333")
-    (region-bg  . "#333333"))
+    ;; ANSI black / white, matching the miasma terminal profile.
+    (black      . "#000000")
+    (white      . "#d7c483")
+    ;; Selection / region, matching the terminal's selection colour.
+    ;; The background is light, so text drawn on it uses the *-fg slot.
+    ;; Override both via `miasma-override-colors-alist' to retint.
+    (selection    . "#e5c47b")
+    (selection-fg . "#222222")
+    (region-bg    . "#e5c47b")
+    (region-fg    . "#222222"))
   "Miasma colour palette — hex strings keyed by role.
 See DESIGN.md for the semantic meaning of each slot.")
 
@@ -160,8 +166,12 @@ See DESIGN.md for the semantic meaning of each slot.")
        (magenta    (alist-get 'magenta colors))
        (cyan       (alist-get 'cyan colors))
        (dark-cyan  (alist-get 'dark-cyan colors))
-       (selection  (alist-get 'selection colors))
-       (region-bg  (alist-get 'region-bg colors))
+       (black      (alist-get 'black colors))
+       (white      (alist-get 'white colors))
+       (selection    (alist-get 'selection colors))
+       (selection-fg (alist-get 'selection-fg colors))
+       (region-bg    (alist-get 'region-bg colors))
+       (region-fg    (alist-get 'region-fg colors))
 
        ;; semantic roles
        (highlight  yellow)
@@ -194,13 +204,13 @@ See DESIGN.md for the semantic meaning of each slot.")
 
 ;;;; basic faces
    `(default             ((t (:background ,bg :foreground ,fg))))
-   `(cursor              ((t (:background ,fg))))
+   `(cursor              ((t (:background ,orange))))
    `(fringe              ((t (:background ,bg :foreground ,base5))))
    `(vertical-border     ((t (:foreground ,vertical-bar))))
    `(window-divider      ((t (:foreground ,vertical-bar))))
    `(window-divider-first-pixel ((t (:foreground ,vertical-bar))))
    `(window-divider-last-pixel  ((t (:foreground ,vertical-bar))))
-   `(region              ((t (:background ,region-bg :extend t))))
+   `(region              ((t (:background ,region-bg :foreground ,region-fg :extend t))))
    `(secondary-selection ((t (:background ,base3 :extend t))))
    `(highlight           ((t (:background ,base3 :foreground ,fg))))
    `(hl-line             ((t (:background ,base2 :extend t))))
@@ -388,11 +398,11 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(magit-section-heading          ((t (:foreground ,yellow :weight bold))))
    `(magit-section-highlight        ((t (:background ,base2 :extend t))))
    ;; Selection highlights (region, marked entries in untracked/staged/…)
-   ;; intentionally use the neutral `selection' slot so they match the rest
-   ;; of Emacs.  Retint via (miasma-override-colors-alist '((selection . …))).
-   `(magit-section-heading-selection    ((t (:foreground ,yellow :background ,selection :extend t))))
-   `(magit-diff-file-heading-selection  ((t (:foreground ,fg :background ,selection :weight bold :extend t))))
-   `(magit-diff-hunk-heading-selection  ((t (:foreground ,blue :background ,selection :extend t))))
+   ;; use the `selection' / `selection-fg' slots so they match the region.
+   ;; Retint via (miasma-override-colors-alist '((selection . …) (selection-fg . …))).
+   `(magit-section-heading-selection    ((t (:foreground ,selection-fg :background ,selection :weight bold :extend t))))
+   `(magit-diff-file-heading-selection  ((t (:foreground ,selection-fg :background ,selection :weight bold :extend t))))
+   `(magit-diff-hunk-heading-selection  ((t (:foreground ,selection-fg :background ,selection :extend t))))
    `(magit-diff-file-heading        ((t (:foreground ,fg :weight bold))))
    `(magit-diff-file-heading-highlight ((t (:background ,base2 :weight bold :extend t))))
    `(magit-diff-hunk-heading        ((t (:foreground ,blue :background ,bg-alt :extend t))))
@@ -500,22 +510,25 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(css-selector             ((t (:foreground ,blue))))
 
 ;;;; ansi-color
-   `(ansi-color-black          ((t (:foreground ,base1 :background ,base1))))
-   `(ansi-color-red            ((t (:foreground ,red   :background ,red))))
-   `(ansi-color-green          ((t (:foreground ,green :background ,green))))
-   `(ansi-color-yellow         ((t (:foreground ,yellow :background ,yellow))))
-   `(ansi-color-blue           ((t (:foreground ,blue  :background ,blue))))
+   ;; Mirrors the miasma Terminal.app profile (miasma-default.terminal).
+   ;; Note the terminal's "yellow" slot is rust (`orange') and its "cyan"
+   ;; slot is amber; normal and bright are identical apart from black.
+   `(ansi-color-black          ((t (:foreground ,black   :background ,black))))
+   `(ansi-color-red            ((t (:foreground ,red     :background ,red))))
+   `(ansi-color-green          ((t (:foreground ,green   :background ,green))))
+   `(ansi-color-yellow         ((t (:foreground ,orange  :background ,orange))))
+   `(ansi-color-blue           ((t (:foreground ,blue    :background ,blue))))
    `(ansi-color-magenta        ((t (:foreground ,magenta :background ,magenta))))
-   `(ansi-color-cyan           ((t (:foreground ,cyan  :background ,cyan))))
-   `(ansi-color-white          ((t (:foreground ,base8 :background ,base8))))
-   `(ansi-color-bright-black   ((t (:foreground ,base4 :background ,base4))))
-   `(ansi-color-bright-red     ((t (:foreground ,orange :background ,orange))))
-   `(ansi-color-bright-green   ((t (:foreground ,teal  :background ,teal))))
-   `(ansi-color-bright-yellow  ((t (:foreground ,yellow :background ,yellow))))
-   `(ansi-color-bright-blue    ((t (:foreground ,blue  :background ,blue))))
+   `(ansi-color-cyan           ((t (:foreground ,cyan    :background ,cyan))))
+   `(ansi-color-white          ((t (:foreground ,white   :background ,white))))
+   `(ansi-color-bright-black   ((t (:foreground ,base6   :background ,base6))))
+   `(ansi-color-bright-red     ((t (:foreground ,red     :background ,red))))
+   `(ansi-color-bright-green   ((t (:foreground ,green   :background ,green))))
+   `(ansi-color-bright-yellow  ((t (:foreground ,orange  :background ,orange))))
+   `(ansi-color-bright-blue    ((t (:foreground ,blue    :background ,blue))))
    `(ansi-color-bright-magenta ((t (:foreground ,magenta :background ,magenta))))
-   `(ansi-color-bright-cyan    ((t (:foreground ,cyan  :background ,cyan))))
-   `(ansi-color-bright-white   ((t (:foreground ,fg    :background ,fg))))))
+   `(ansi-color-bright-cyan    ((t (:foreground ,cyan    :background ,cyan))))
+   `(ansi-color-bright-white   ((t (:foreground ,white   :background ,white))))))
 
 ;;
 ;;; Autoload

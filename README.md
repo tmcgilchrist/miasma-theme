@@ -71,9 +71,10 @@ Tweak any palette entry without forking the theme:
 
 ```emacs-lisp
 (setq miasma-override-colors-alist
-      '((selection . "#3a2f22")    ; warmer selection / magit highlight
-        (region-bg . "#2a2a2a")    ; separate colour for Emacs region
-        (comments  . "#8a8a7a"))) ; brighter comments
+      '((selection    . "#3a2f22")   ; darker magit selection highlight
+        (selection-fg . "#c2c2b0")   ; ...so use light text on it
+        (region-bg    . "#333333")   ; neutral grey Emacs region
+        (region-fg    . "#c2c2b0")))
 (load-theme 'miasma t)
 ```
 

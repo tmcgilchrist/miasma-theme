@@ -19,6 +19,9 @@ the Emacs / doom-themes face vocabulary, but the *hues* are deliberately warm:
 | `blue`    | `#78824b` | olive (not blue)  | keywords, operators                  |
 | `magenta` | `#bb7744` | burnt orange      | builtins, variables                  |
 | `cyan`    | `#c9a554` | amber (= yellow)  | methods                              |
+| `white`   | `#d7c483` | cream             | ANSI white                           |
+| `black`   | `#000000` | black             | ANSI black                           |
+| `selection` / `region-bg` | `#e5c47b` | pale gold | active region, magit selection |
 
 This is a feature, not a bug. When adding a face, pick the slot whose *role*
 fits — do not reach for a colour because its name sounds right. If you want a
@@ -42,12 +45,25 @@ Each slot has a role that stays consistent across every face:
   to brown than crimson, so errors *look* serious without being alarming.
 - **base5 / base6 (greys)** — comments, inactive UI, line numbers. Receding
   tones that layer without competing.
-- **selection / region-bg (neutral dark grey, default `#333333`)** —
-  backgrounds for the active region and for magit's section / diff
-  selection highlights. Kept neutral on purpose: selection should signal
-  "this is what you picked" without competing with accent colours already
-  on the line. Retint either slot via `miasma-override-colors-alist`
-  (e.g. `'((selection . "#3a2f22"))` for a warmer highlight).
+- **selection / region-bg (pale gold, default `#e5c47b`)** — backgrounds
+  for the active region and for magit's section / diff selection
+  highlights, matching the miasma terminal's selection colour. The
+  background is light, so text on it is drawn in `selection-fg` /
+  `region-fg` (default `#222222`, the editor background). Retint via
+  `miasma-override-colors-alist`, always overriding the background and
+  foreground together (e.g. `'((region-bg . "#333333") (region-fg . "#c2c2b0"))`
+  for the old neutral grey).
+- **orange (cursor)** — the cursor is rust, as in the terminal profile.
+
+## Terminal parity
+
+The `ansi-color-*` faces mirror the miasma Terminal.app profile
+(`miasma-default.terminal`) exactly, so shell, compile and eshell output
+looks the same in Emacs as in the terminal. The terminal's slot names
+don't follow the Emacs palette names: ANSI *yellow* is `orange` (rust),
+ANSI *cyan* is the amber `cyan`/`yellow`, and ANSI *white* is `white`
+(cream). Normal and bright colours are identical except bright black,
+which is `base6`.
 
 When theming a new package, match the closest role. Consistency across
 packages matters more than local visual variety.
