@@ -4,7 +4,7 @@
 ;;
 ;; Author: Tim McGilchrist <tim@mcgilchrist.com>
 ;; Created: October 28, 2024
-;; Version: 0.2.0
+;; Version: 0.1.0
 ;; Keywords: faces, theme
 ;; Homepage:
 ;; Package-Requires: ((emacs "27.1"))
