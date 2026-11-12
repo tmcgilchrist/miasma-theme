@@ -12,10 +12,22 @@ All notable changes to miasma-theme are documented here. Versions follow
   `red`, and black uses the new `black` slot.
 - Cursor is now rust (`orange`), matching the terminal profile.
 - Region and magit selection highlights now use the terminal's pale gold
-  selection colour (`#e5c47b`) with dark text, replacing the neutral grey.
+  selection colour (`#e5c47b`) blended into the background at 15%
+  (`#3f3a2f`), replacing the neutral grey. Selected text keeps its
+  syntax colours.
+- The `selection` palette slot is now a tint that is blended into the
+  background, rather than a background colour used as-is. An explicit
+  `region-bg` override is still used as-is.
 
 ### Added
-- Palette slots `black`, `white`, `selection-fg` and `region-fg`.
+- Palette slots `black` and `white`.
+- `miasma-selection-alpha` defcustom (default `0.15`) controlling the
+  strength of the selection tint.
+- `miasma-blend` colour helper.
+- `whitespace-mode` faces. Tabs and spaces are now a faint lift off the
+  background instead of falling back to another theme's (or Emacs's)
+  defaults; trailing whitespace and mixed indentation use muted
+  red / rust tints.
 
 ## 0.1.0
 

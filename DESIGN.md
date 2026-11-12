@@ -21,7 +21,7 @@ the Emacs / doom-themes face vocabulary, but the *hues* are deliberately warm:
 | `cyan`    | `#c9a554` | amber (= yellow)  | methods                              |
 | `white`   | `#d7c483` | cream             | ANSI white                           |
 | `black`   | `#000000` | black             | ANSI black                           |
-| `selection` / `region-bg` | `#e5c47b` | pale gold | active region, magit selection |
+| `selection` | `#e5c47b` | pale gold (tint)  | blended into `bg` for the region     |
 
 This is a feature, not a bug. When adding a face, pick the slot whose *role*
 fits — do not reach for a colour because its name sounds right. If you want a
@@ -45,14 +45,15 @@ Each slot has a role that stays consistent across every face:
   to brown than crimson, so errors *look* serious without being alarming.
 - **base5 / base6 (greys)** — comments, inactive UI, line numbers. Receding
   tones that layer without competing.
-- **selection / region-bg (pale gold, default `#e5c47b`)** — backgrounds
-  for the active region and for magit's section / diff selection
-  highlights, matching the miasma terminal's selection colour. The
-  background is light, so text on it is drawn in `selection-fg` /
-  `region-fg` (default `#222222`, the editor background). Retint via
-  `miasma-override-colors-alist`, always overriding the background and
-  foreground together (e.g. `'((region-bg . "#333333") (region-fg . "#c2c2b0"))`
-  for the old neutral grey).
+- **selection (pale gold tint, default `#e5c47b`)** — the miasma
+  terminal's selection colour. Emacs faces can't be translucent, so the
+  region background is this tint blended into `bg` at
+  `miasma-selection-alpha` (default `0.15`, giving `#3f3a2f`). The same
+  background is used for magit's section / diff selection highlights.
+  Selected text keeps its syntax colours: the selection should signal
+  "this is what you picked" without hiding what's on the line. Adjust
+  the alpha for a stronger or subtler tint, or override `region-bg` in
+  `miasma-override-colors-alist` to set an exact colour.
 - **orange (cursor)** — the cursor is rust, as in the terminal profile.
 
 ## Terminal parity
