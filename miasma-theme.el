@@ -4,7 +4,7 @@
 ;;
 ;; Author: Tim McGilchrist <tim@mcgilchrist.com>
 ;; Created: October 28, 2024
-;; Version: 0.2.0
+;; Version: 0.1.0
 ;; Keywords: faces, theme
 ;; Homepage:
 ;; Package-Requires: ((emacs "27.1"))
@@ -58,6 +58,15 @@ Set before loading the theme."
   :group 'miasma-theme
   :type 'boolean)
 
+(defcustom miasma-selection-alpha 0.15
+  "Opacity of the `selection' tint over the background, from 0 to 1.
+Emacs faces cannot be translucent, so the region background is the
+`selection' colour blended into `bg' by this fraction.  Lower values
+are subtler; higher values are closer to the terminal's solid gold.
+Set before loading the theme."
+  :group 'miasma-theme
+  :type 'number)
+
 (defcustom miasma-override-colors-alist '()
   "Alist of colour overrides.
 Each entry is (NAME . HEX) where NAME matches a key in
@@ -96,6 +105,14 @@ changes take effect next time the theme is loaded."
                         (+ g (* (- 1 g) fraction))
                         (+ b (* (- 1 b) fraction)))))
 
+(defun miasma-blend (hex base alpha)
+  "Return HEX laid over BASE at opacity ALPHA in [0,1]."
+  (pcase-let ((`(,r1 ,g1 ,b1) (miasma--hex-to-rgb hex))
+              (`(,r2 ,g2 ,b2) (miasma--hex-to-rgb base)))
+    (miasma--rgb-to-hex (+ (* r1 alpha) (* r2 (- 1 alpha)))
+                        (+ (* g1 alpha) (* g2 (- 1 alpha)))
+                        (+ (* b1 alpha) (* b2 (- 1 alpha))))))
+
 ;;
 ;;; Palette
 
@@ -124,10 +141,13 @@ changes take effect next time the theme is loaded."
     (violet     . "#bb7744")
     (cyan       . "#c9a554")
     (dark-cyan  . "#b39448")
-    ;; Neutral greys used for selection / region backgrounds.
-    ;; Override via `miasma-override-colors-alist' to retint selection.
-    (selection  . "#333333")
-    (region-bg  . "#333333"))
+    ;; ANSI black / white, matching the miasma terminal profile.
+    (black      . "#000000")
+    (white      . "#d7c483")
+    ;; Selection tint, matching the terminal's selection colour.  It is
+    ;; blended into `bg' at `miasma-selection-alpha' to get the region
+    ;; background, so selected text keeps its syntax colours.
+    (selection  . "#e5c47b"))
   "Miasma colour palette — hex strings keyed by role.
 See DESIGN.md for the semantic meaning of each slot.")
 
@@ -160,8 +180,13 @@ See DESIGN.md for the semantic meaning of each slot.")
        (magenta    (alist-get 'magenta colors))
        (cyan       (alist-get 'cyan colors))
        (dark-cyan  (alist-get 'dark-cyan colors))
+       (black      (alist-get 'black colors))
+       (white      (alist-get 'white colors))
        (selection  (alist-get 'selection colors))
-       (region-bg  (alist-get 'region-bg colors))
+       ;; An explicit `region-bg' override (supported since 0.1.0) wins
+       ;; over the blended tint.
+       (region-bg  (or (alist-get 'region-bg miasma-override-colors-alist)
+                       (miasma-blend selection bg miasma-selection-alpha)))
 
        ;; semantic roles
        (highlight  yellow)
@@ -194,7 +219,7 @@ See DESIGN.md for the semantic meaning of each slot.")
 
 ;;;; basic faces
    `(default             ((t (:background ,bg :foreground ,fg))))
-   `(cursor              ((t (:background ,fg))))
+   `(cursor              ((t (:background ,orange))))
    `(fringe              ((t (:background ,bg :foreground ,base5))))
    `(vertical-border     ((t (:foreground ,vertical-bar))))
    `(window-divider      ((t (:foreground ,vertical-bar))))
@@ -388,11 +413,11 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(magit-section-heading          ((t (:foreground ,yellow :weight bold))))
    `(magit-section-highlight        ((t (:background ,base2 :extend t))))
    ;; Selection highlights (region, marked entries in untracked/staged/…)
-   ;; intentionally use the neutral `selection' slot so they match the rest
-   ;; of Emacs.  Retint via (miasma-override-colors-alist '((selection . …))).
-   `(magit-section-heading-selection    ((t (:foreground ,yellow :background ,selection :extend t))))
-   `(magit-diff-file-heading-selection  ((t (:foreground ,fg :background ,selection :weight bold :extend t))))
-   `(magit-diff-hunk-heading-selection  ((t (:foreground ,blue :background ,selection :extend t))))
+   ;; use the same blended background as the region.  Retint via
+   ;; `miasma-selection-alpha' or (miasma-override-colors-alist '((selection . …))).
+   `(magit-section-heading-selection    ((t (:foreground ,yellow :background ,region-bg :extend t))))
+   `(magit-diff-file-heading-selection  ((t (:foreground ,fg :background ,region-bg :weight bold :extend t))))
+   `(magit-diff-hunk-heading-selection  ((t (:foreground ,blue :background ,region-bg :extend t))))
    `(magit-diff-file-heading        ((t (:foreground ,fg :weight bold))))
    `(magit-diff-file-heading-highlight ((t (:background ,base2 :weight bold :extend t))))
    `(magit-diff-hunk-heading        ((t (:foreground ,blue :background ,bg-alt :extend t))))
@@ -415,6 +440,22 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(magit-process-ng               ((t (:foreground ,red :weight bold))))
    `(magit-signature-good           ((t (:foreground ,green))))
    `(magit-signature-bad            ((t (:foreground ,red :weight bold))))
+
+;;;; whitespace-mode
+   ;; Visible but quiet: tabs and spaces are a faint lift off `bg';
+   ;; only genuine problems (trailing space, mixed indentation) use colour.
+   `(whitespace-tab          ((t (:background ,(miasma-lighten bg 0.04) :foreground ,base4))))
+   `(whitespace-space        ((t (:background ,bg :foreground ,base4))))
+   `(whitespace-hspace       ((t (:background ,bg :foreground ,base4))))
+   `(whitespace-newline      ((t (:foreground ,base4))))
+   `(whitespace-trailing     ((t (:foreground unspecified :background ,red))))
+   `(whitespace-line         ((t (:foreground unspecified :background ,(miasma-blend orange bg 0.15)))))
+   `(whitespace-empty        ((t (:foreground unspecified :background ,(miasma-blend yellow bg 0.1) :extend t))))
+   `(whitespace-indentation  ((t (:foreground unspecified :background ,(miasma-blend orange bg 0.25)))))
+   `(whitespace-big-indent   ((t (:foreground unspecified :background ,(miasma-blend red bg 0.5)))))
+   `(whitespace-space-before-tab ((t (:foreground unspecified :background ,(miasma-blend orange bg 0.25)))))
+   `(whitespace-space-after-tab  ((t (:foreground unspecified :background ,(miasma-blend orange bg 0.25)))))
+   `(whitespace-missing-newline-at-eof ((t (:foreground unspecified :background ,(miasma-blend orange bg 0.25)))))
 
 ;;;; flymake / flycheck
    `(flymake-error    ((t (:underline (:style wave :color ,red)))))
@@ -500,22 +541,25 @@ See DESIGN.md for the semantic meaning of each slot.")
    `(css-selector             ((t (:foreground ,blue))))
 
 ;;;; ansi-color
-   `(ansi-color-black          ((t (:foreground ,base1 :background ,base1))))
-   `(ansi-color-red            ((t (:foreground ,red   :background ,red))))
-   `(ansi-color-green          ((t (:foreground ,green :background ,green))))
-   `(ansi-color-yellow         ((t (:foreground ,yellow :background ,yellow))))
-   `(ansi-color-blue           ((t (:foreground ,blue  :background ,blue))))
+   ;; Mirrors the miasma Terminal.app profile (miasma-default.terminal).
+   ;; Note the terminal's "yellow" slot is rust (`orange') and its "cyan"
+   ;; slot is amber; normal and bright are identical apart from black.
+   `(ansi-color-black          ((t (:foreground ,black   :background ,black))))
+   `(ansi-color-red            ((t (:foreground ,red     :background ,red))))
+   `(ansi-color-green          ((t (:foreground ,green   :background ,green))))
+   `(ansi-color-yellow         ((t (:foreground ,orange  :background ,orange))))
+   `(ansi-color-blue           ((t (:foreground ,blue    :background ,blue))))
    `(ansi-color-magenta        ((t (:foreground ,magenta :background ,magenta))))
-   `(ansi-color-cyan           ((t (:foreground ,cyan  :background ,cyan))))
-   `(ansi-color-white          ((t (:foreground ,base8 :background ,base8))))
-   `(ansi-color-bright-black   ((t (:foreground ,base4 :background ,base4))))
-   `(ansi-color-bright-red     ((t (:foreground ,orange :background ,orange))))
-   `(ansi-color-bright-green   ((t (:foreground ,teal  :background ,teal))))
-   `(ansi-color-bright-yellow  ((t (:foreground ,yellow :background ,yellow))))
-   `(ansi-color-bright-blue    ((t (:foreground ,blue  :background ,blue))))
+   `(ansi-color-cyan           ((t (:foreground ,cyan    :background ,cyan))))
+   `(ansi-color-white          ((t (:foreground ,white   :background ,white))))
+   `(ansi-color-bright-black   ((t (:foreground ,base6   :background ,base6))))
+   `(ansi-color-bright-red     ((t (:foreground ,red     :background ,red))))
+   `(ansi-color-bright-green   ((t (:foreground ,green   :background ,green))))
+   `(ansi-color-bright-yellow  ((t (:foreground ,orange  :background ,orange))))
+   `(ansi-color-bright-blue    ((t (:foreground ,blue    :background ,blue))))
    `(ansi-color-bright-magenta ((t (:foreground ,magenta :background ,magenta))))
-   `(ansi-color-bright-cyan    ((t (:foreground ,cyan  :background ,cyan))))
-   `(ansi-color-bright-white   ((t (:foreground ,fg    :background ,fg))))))
+   `(ansi-color-bright-cyan    ((t (:foreground ,cyan    :background ,cyan))))
+   `(ansi-color-bright-white   ((t (:foreground ,white   :background ,white))))))
 
 ;;
 ;;; Autoload

@@ -71,10 +71,17 @@ Tweak any palette entry without forking the theme:
 
 ```emacs-lisp
 (setq miasma-override-colors-alist
-      '((selection . "#3a2f22")    ; warmer selection / magit highlight
-        (region-bg . "#2a2a2a")    ; separate colour for Emacs region
-        (comments  . "#8a8a7a"))) ; brighter comments
+      '((selection . "#78824b")))  ; tint the selection olive instead of gold
 (load-theme 'miasma t)
+```
+
+The region background is the `selection` colour blended into the
+background at `miasma-selection-alpha` (default `0.15`). Raise it for a
+stronger highlight, or override `region-bg` to set an exact colour:
+
+```emacs-lisp
+(setq miasma-selection-alpha 0.3)                            ; stronger tint
+(setq miasma-override-colors-alist '((region-bg . "#333333"))) ; plain grey
 ```
 
 Inspect `miasma-colors-alist` for every available slot. Overrides take
@@ -124,7 +131,7 @@ Beyond every built-in Emacs face, miasma tunes these packages:
 - **Writing:** org-mode (levels, agenda, blocks, code, dates, todo),
   markdown-mode, outline
 - **Diff:** diff-mode, ediff
-- **Misc:** dired, isearch, ansi-color, LaTeX, css/scss
+- **Misc:** dired, isearch, ansi-color, whitespace-mode, LaTeX, css/scss
 
 Missing a package? Open an issue or a PR.
 
